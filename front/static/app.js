@@ -80,9 +80,8 @@ agentApp.controller(
 
       this.sizes = ['1U1G', '1U2G', '2U2G', '2U4G', '4U8G', '4U16G']
       this.size = '1U2G'
-      this.instanceNum = 1
       this.create_app = function() {
-        configService.configForm = {password: self.password, size: self.size, instanceNum: self.instanceNum}
+        configService.configForm = {password: self.password, size: self.size}
         $location.path('/creating')
       }
     }

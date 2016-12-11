@@ -32,7 +32,7 @@ def create_app(request):
         "name": SERVICE_NAME,
         "spec": {
             "unitType": params["size"], 
-            "instanceNum": params["instanceNum"],
+            "instanceNum": 1,
             "envs": ["GF_SECURITY_ADMIN_PASSWORD={}".format(params["password"])],
             "image": IMAGE
         }
