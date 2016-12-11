@@ -87,3 +87,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# docker image
+*.img
+docker-compose.yml
+
+# sqlite
+*.sqlite3
