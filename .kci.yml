@@ -1,0 +1,15 @@
+pipeline:
+  index.qiniu.com/kci/plugin_docker:
+    repo: qcloud/grafana-seed
+    tag: "v${DRONE_JOB_STARTED#TF#20060102T150405}"
+    workdir: ./product-doc/kirk-docs.qiniu.com
+    storage_path: /cache/qbox
+    when:
+      branch: master
+      event: push
+  index.qiniu.com/kci/plugin_email:
+    recipients:
+      - qcos-dev@qiniu.com
+    when:
+      branch: master
+      status: [ failure, success ]
