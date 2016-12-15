@@ -1,3 +1,5 @@
+#! /bin/sh
+
+cd /app/agent
 nginx
-cd agent
-uwsgi --ini uwsgi.ini
+python manage.py makemigrations api && python manage.py migrate && uwsgi --ini uwsgi.ini
