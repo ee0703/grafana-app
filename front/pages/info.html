@@ -1,3 +1,17 @@
-<p>服务信息: {{ctrl.service_info}}</p>
+<p>服务信息: </p>
 <br>
+<table class="table table-striped">
+  <tr>
+    <td>状态</td>
+    <td>{{ctrl.service_info.status}}</td>
+  </tr>
+  <tr>
+    <td>规格</td>
+    <td>{{ctrl.service_info.spec.unitType}}</td>
+  </tr>
+  <tr>
+    <td>内网地址</td>
+    <td>{{ctrl.service_info.apPorts[0].ip}}</td>
+  </tr>
+</table>
 访问: <button type="submit" ng-click="ctrl.access()" class="btn btn-default">获取访问地址</button>

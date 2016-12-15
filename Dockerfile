@@ -1,6 +1,8 @@
-FROM index.qiniu.com/alpine
+FROM alpine
 
-RUN apk add --update python nginx python-dev py-pip sqlite tcpflow \
+RUN echo "https://mirrors.ustc.edu.cn/alpine/v3.4/main" > /etc/apk/repositories \
+  && echo "https://mirrors.ustc.edu.cn/alpine/v3.4/community" >> /etc/apk/repositories \
+  && apk add --update python nginx python-dev py-pip sqlite tcpflow \
   gcc musl-dev linux-headers && \
   rm -rf /var/cache/apk/*
 

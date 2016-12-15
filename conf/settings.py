@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'agent.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('/', 'seed-data' 'db.sqlite3'),
+        'NAME': os.path.join('/data', 'db.sqlite3'),
     }
 }
 

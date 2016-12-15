@@ -3,7 +3,7 @@ import json
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from qiniu import QcosClient
-from .models import Config, get_or_create_config, set_or_create_config
+from .models import Config, get_or_create_config, set_or_create_config, update_status
 
 
 QCOS_API = QcosClient(None)
@@ -33,27 +33,30 @@ def create_app(request):
         "spec": {
             "unitType": params["size"], 
             "instanceNum": 1,
-            "envs": ["GF_SECURITY_ADMIN_PASSWORD={}".format(params["password"])],
+            "envs": [
+                "GF_SECURITY_ADMIN_PASSWORD={}".format(params["password"]),
+                "GF_SECURITY_ADMIN_USER=admin"
+            ],
             "image": IMAGE
         }
     }
 
-    Config.objects.filter(name="status").update(value="creating:stack")
+    update_status("creating:stack")
     result = QCOS_API.list_stacks()
     if result[0] is not None and STACK_NAME not in [s["name"] for s in result[0]]:
         QCOS_API.create_stack({"name": STACK_NAME})
 
-    Config.objects.filter(name="status").update(value="creating:service")
+    update_status("creating:service")
     result = QCOS_API.create_service(STACK_NAME, service)
     if result[0] is None:
-        Config.objects.filter(name="status").update(value="failed")
+        update_status("failed")
         return JsonResponse({"result": "failed creating service"})
 
     # 接入点和端口设置
-    Config.objects.filter(name="status").update(value="creating:network")
+    update_status("creating:network")
     ap = QCOS_API.create_ap({"type": "INTERNAL_IP", "title": "interal_ip"})
     if ap[0] is None:
-        Config.objects.filter(name="status").update(value="failed")
+        update_status("failed")
         return JsonResponse({"result": "failed creating ap"})
 
     port_cfg = {
@@ -69,12 +72,12 @@ def create_app(request):
     }
     result = QCOS_API.set_ap_port(ap[0]["apid"], 80, port_cfg)
     if result[0] is None:
-        Config.objects.filter(name="status").update(value="failed")
+        update_status("failed")
         return JsonResponse({"result": "failed creating port"})
 
     set_or_create_config(name="ip", value=ap[0]["ip"])
     set_or_create_config(name="apid", value=ap[0]["apid"])
-    Config.objects.filter(name="status").update(value="deployed")
+    update_status("deployed")
     return JsonResponse({"result": "success"})
 
 

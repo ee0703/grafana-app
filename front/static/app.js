@@ -69,10 +69,10 @@ agentApp.controller(
         if (data.value === "deployed") {
           $location.path('/info')
         }
-        if (data.value === "failed") {
+        else if (data.value === "failed") {
           $location.path('/failed')
         }
-        if (data.value !== "initialized") {
+        else if (data.value !== "initialized") {
           console.log(self.status.value)
           $location.path('/creating')
         }
@@ -125,12 +125,25 @@ agentApp.controller(
 agentApp.controller(
   'infoController', 
   [
-    '$scope', '$log', '$location',  'agentApi', 'kirkApi', 'configService',
-    function($scope, $log, $location, agentApi, kirkApi, configService){
+    '$scope', '$log', '$location',  '$interval', 'agentApi', 'kirkApi', 'configService',
+    function($scope, $log, $location, $interval, agentApi, kirkApi, configService){
       var self = this
-      this.service_info = kirkApi.get_service_info()
+
+      // set auto update
+      var updateInfo = function() {
+        self.service_info = kirkApi.get_service_info()
+      }
+      updateInfo()
+      intvl = $interval(updateInfo, 5000)
+      $scope.$on('$destroy', function() {
+         $interval.cancel(intvl);
+      });
       
       this.access = function(){
+        if(this.service_info.status !== "RUNNING") {
+          alert("服务尚未运行，请等待服务运行!");
+          return;
+        }
         kirkApi.get_access_addr().$promise.then(function(data){
           window.open(data.oneTimeUrl, '_blank');
         })

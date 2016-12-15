@@ -33,5 +33,6 @@ def set_or_create_config(name, value):
         cfg[0].save()
         return cfg[0]
 
-
-      
+    
+def update_status(value):
+    return Config.objects.filter(name="status").update(value=value)
