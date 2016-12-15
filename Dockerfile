@@ -1,4 +1,4 @@
-FROM alpine
+FROM index.qiniu.com/alpine
 
 RUN echo "https://mirrors.ustc.edu.cn/alpine/v3.4/main" > /etc/apk/repositories \
   && echo "https://mirrors.ustc.edu.cn/alpine/v3.4/community" >> /etc/apk/repositories \
