@@ -4,7 +4,9 @@ RUN apk add --update python nginx python-dev py-pip sqlite tcpflow \
   gcc musl-dev linux-headers && \
   rm -rf /var/cache/apk/*
 
-COPY agent front requirements.txt start.sh /app/
+COPY agent /app/agent
+COPY front /app/front
+COPY requirements.txt start.sh /app/
 
 RUN mkdir /run/nginx \
   && cd /app \
