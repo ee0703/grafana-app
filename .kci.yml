@@ -4,6 +4,7 @@ pipeline:
     tag: "v${DRONE_JOB_STARTED#TF#20060102T150405}"
     workdir: ./product-doc/kirk-docs.qiniu.com
     storage_path: /cache/qbox
+    nocache: true
     when:
       branch: master
       event: push
