@@ -9,7 +9,7 @@ from .models import Config, get_or_create_config, set_or_create_config, update_s
 QCOS_API = QcosClient(None)
 STACK_NAME = "default"
 SERVICE_NAME = "grafana-managed"
-IMAGE = "library/grafana:3.1.1"
+IMAGE = "library/grafana:latest"
 
 
 def index(request):
