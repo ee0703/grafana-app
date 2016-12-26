@@ -13,9 +13,23 @@ IMAGE = "library/grafana:latest"
 
 
 def index(request):
-    data = {"mesage": "Hello, world. You're at the api index.", "status": "ok"}
+    data = {"message": "Hello, world. You're at the api index.", "status": "ok"}
     return JsonResponse(data)
 
+def health_check(request):
+    status = get_or_create_config(name="status", value="initialized").value.split(":")[0]
+    health_status = ""
+    if status == "initialized":
+        health_status = "config"
+    elif status == "creating":
+        health_status = "deploying"
+    elif status == "failed":
+        health_status = "error"
+    else:
+        health_status = QCOS_API.get_service_inspect(STACK_NAME, SERVICE_NAME)[0]["status"]
+        
+    data = {"message": "", "status": health_status}
+    return JsonResponse(data)
 
 def status(request):
     data = get_or_create_config(name="status", value="initialized")

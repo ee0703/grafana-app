@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^kirk/service_info$', views.service_info, name='service_info'),
     url(r'^kirk/access_addr$', views.access_addr, name='access_addr'),
     url(r'^kirk/ap_info$', views.ap_info, name='ap_info'),
+    url(r'^healthcheck$', views.health_check, name='health_check'),
 ]
