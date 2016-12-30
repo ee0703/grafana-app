@@ -1,8 +1,23 @@
 
-<div class="row">
+<style>
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+</style>
+
+<!--<div class="row">
   <div class="col-md-12">
-    <h3>创建中<span ng-repeat="i in [].constructor(ctrl.count % 3 + 1) track by $index">.</span></h3>
+    <h3>创建中</h3>
     <p ng-cloak ng-if="ctrl.status">status: {{ctrl.status.value}}</p>
   </div>
+</div>-->
+
+<div class="centered gf-seed-loding">
+  <img src="/static/gears.gif" alt="">
+  <h5>创建中，请稍候.<span ng-repeat="i in [].constructor(ctrl.count % 3 + 1) track by $index">.</span></h5>
 </div>
 

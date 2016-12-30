@@ -1,25 +1,21 @@
 
 <div class="row" ng-if="ctrl.status && ctrl.status.value==='initialized'">
-  <form ng-submit="ctrl.create_app()">
+  <form name="configForm">
     <div class="col-md-6">
-    <h3>参数配置</h3>
-    <hr>
-    <div class="form-group">
-      <div class="input-group">
-        <span class="input-group-addon">密　码</span>
-        <input type="password" ng-model="ctrl.password" class="form-control" placeholder="********" required>
-      </div>
-      <br>
-      <div>
-        <span>规&nbsp;格</span>
-        <select ng-model="ctrl.size">
-          <option ng-repeat="sz in ctrl.sizes" value="{{sz}}">{{sz}}</option>
-        </select>
-      </div>
-    </div>
-      <div class="pull-right">
-        <input type="submit" class="btn btn-default" value="创建">
-      </div>
+      <h5 style="color:#5e6166">参数配置</h5>
+      <hr>
+      <span><b>密　　码　</b></span>
+      <input style="width:300px;display:inline-block;" class="form-control" type="password" name="password" ng-model="ctrl.password" placeholder="请输入密码" ng-required ng-change="ctrl.check_pwd()">
+      <br><br>
+      <span><b>确认密码　</b></span>
+      <input style="width:300px;display:inline-block;" class="form-control" type="password" name='confirm_password' ng-model="ctrl.password2" placeholder="请确认密码" ng-required ng-change="ctrl.check_pwd()">
+      
+      <hr> 
+
+      <div ng-show="ctrl.errmsg" class="alert alert-danger" role="alert"> {{ctrl.errmsg}} </div>
+      <a ng-click="ctrl.create_app()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">
+        创建
+      </a>
     </div>
   </form>
 </div>

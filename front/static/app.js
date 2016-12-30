@@ -78,10 +78,33 @@ agentApp.controller(
         }
       })
 
-      this.sizes = ['1U1G', '1U2G', '2U2G', '2U4G', '4U8G', '4U16G']
-      this.size = '1U2G'
+      this.submiting = false
+
+      this.check_pwd = function(){
+
+        if(!this.password || this.password.length < 6) {
+          this.errmsg = "密码长度必须在6位以上"
+          return
+        }
+
+        if(this.password != this.password2) {
+          this.errmsg = "两次输入的密码不一致"
+          return
+        }
+
+        this.errmsg = ""
+
+      }
+
       this.create_app = function() {
-        configService.configForm = {password: self.password, size: self.size}
+
+        this.check_pwd()
+        if(this.errmsg) {
+          return
+        }
+
+        this.submiting = true
+        configService.configForm = {password: self.password, size: '1U2G'}
         $location.path('/creating')
       }
     }
@@ -104,8 +127,11 @@ agentApp.controller(
 
       // set auto update
       var updateStatus = function() {
-        if (self.status && self.status.value==="deployed") {
+        if (self.service_status && self.service_status.status==="RUNNING") {
           $location.path("/info")
+        }
+        if (self.status && self.status.value==="deployed") {
+          self.service_status = kirkApi.get_service_info()
         }
         if (self.status && self.status.value==="failed") {
           $location.path("/failed")
@@ -146,6 +172,18 @@ agentApp.controller(
         }
         kirkApi.get_access_addr().$promise.then(function(data){
           window.open(data.oneTimeUrl, '_blank');
+        })
+      }
+
+      self.addr = ""
+      this.get_access = function(){
+        self.addr = "";
+        if(this.service_info.status !== "RUNNING") {
+          alert("服务尚未运行，请等待服务运行!");
+          return;
+        }
+        kirkApi.get_access_addr().$promise.then(function(data){
+          self.addr = data.oneTimeUrl;
         })
       }
     }

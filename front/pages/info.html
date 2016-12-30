@@ -1,17 +1,17 @@
-<p>服务信息: </p>
-<br>
-<table class="table table-striped">
+<h5 style="color:#5e6166">Grafana 服务管理</h5>
+<hr>
+<table class="table">
   <tr>
     <td>状态</td>
     <td>{{ctrl.service_info.status}}</td>
   </tr>
-  <tr>
-    <td>规格</td>
-    <td>{{ctrl.service_info.spec.unitType}}</td>
-  </tr>
-  <tr>
-    <td>内网地址</td>
-    <td>{{ctrl.service_info.apPorts[0].ip}}</td>
-  </tr>
 </table>
-访问: <button type="submit" ng-click="ctrl.access()" class="btn btn-default">获取访问地址</button>
+<a ng-click="ctrl.get_access()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">
+  获取访问地址
+</a>
+<a ng-click="ctrl.access()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">
+  访问Grafana
+</a>
+<br>
+<br>
+<div ng-show="ctrl.addr" class="alert alert-info" role="alert"> {{ctrl.addr}} </div>
