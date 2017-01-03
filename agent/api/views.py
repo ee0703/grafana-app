@@ -2,18 +2,16 @@
 import json
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
-from qiniu import QcosClient
+from utils.qcos import QCOS_API, APP_API, Proxy
 from .models import Config, get_or_create_config, set_or_create_config, update_status
 
-
-QCOS_API = QcosClient(None)
 STACK_NAME = "default"
 SERVICE_NAME = "grafana-managed"
 IMAGE = "library/grafana:latest"
 
 
 def index(request):
-    data = {"message": "Hello, world. You're at the api index.", "status": "ok"}
+    data = {"message": "Hello, world.", "status": "ok"}
     return JsonResponse(data)
 
 def health_check(request):
@@ -112,3 +110,17 @@ def access_addr(request):
     ip = Config.objects.get(name="ip").value
     data = QCOS_API.get_web_proxy("%s:80" % ip)
     return JsonResponse(data[0])
+
+
+def get_apps(request):
+    data = APP_API.list_apps()
+    apps = data[0]
+    if apps is None:
+        return JsonResponse({}, status=500)
+    return JsonResponse(apps, safe=False)
+
+
+def get_data_sources(request):
+    with Proxy() as session:
+        data = session.get("/api/datasources")
+        return JsonResponse({"data": str(data)})

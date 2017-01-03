@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^kirk/access_addr$', views.access_addr, name='access_addr'),
     url(r'^kirk/ap_info$', views.ap_info, name='ap_info'),
     url(r'^healthcheck$', views.health_check, name='health_check'),
+    url(r'^kirk/apps$', views.get_apps, name='get_apps'),
 ]
