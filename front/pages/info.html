@@ -1,9 +1,32 @@
 <h5 style="color:#5e6166">Grafana 服务管理</h5>
+
 <hr>
+
+<div class="alert alert-info" role="alert">
+
+  <p ng-if="ctrl.isLoding()">
+    <img src="/static/loading-2.gif" alt="">
+    正在获取用户账户和grafana配置信息
+  </p>
+  
+  <p ng-if="!(ctrl.isLoding()) && ctrl.appauth_status && !ctrl.appauth_status.status">
+    暂时不能获取账户信息（请确认app有获取账户信息的权限)
+  </p>
+
+  <div ng-if="!(ctrl.isLoding()) && ctrl.appauth_status && ctrl.appauth_status.status">
+    <p ng-repeat="app in ctrl.app_list">
+      <a ng-if="!ctrl.alredy_add(app.uri)" ng-click="ctrl.add_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">添加监控</a>
+      <a ng-if="ctrl.alredy_add(app.uri)" ng-click="ctrl.delete_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">删除监控</a>
+      {{app.uri}}
+    </p>
+  </div>
+
+</div>
+
 <table class="table">
   <tr>
     <td>状态</td>
-    <td>{{ctrl.service_info.status}}</td>
+    <td>{{ctrl.service_info.status || "获取中..."}}</td>
   </tr>
 </table>
 <a ng-click="ctrl.get_access()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">

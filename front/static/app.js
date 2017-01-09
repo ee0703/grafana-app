@@ -28,10 +28,30 @@ agentApp.config(['$qProvider', function ($qProvider) {
 
 
 // SERVICES
+// ------------ api services defined below ------------
+
 agentApp.service('agentApi', ['$resource', function($resource){
   var status = $resource("/api/status", {}, {get: {method: "GET"}})
   this.getStatus = function() {
     return status.get()
+  }
+
+  var appauth_status = $resource("/api/appauth_status", {}, {get: {method: "GET"}})
+  this.getAppAuthStatus = function() {
+    return appauth_status.get()
+  }
+
+  var data_sources = $resource("/api/grafana/data_sources", {}, {post: {method: "POST"}, get: {method: "GET"}})
+  this.add_datasource = function(data) {
+    return data_sources.post(data)
+  }
+  this.get_datasource = function() {
+    return data_sources.get()
+  }
+
+  var data_sources_del = $resource("/api/grafana/data_sources/:id", {}, {"delete": {method: "DELETE"}})
+  this.delete_datasource = function(id) {
+    return data_sources_del.delete({id:id})
   }
 }])
 
@@ -50,6 +70,11 @@ agentApp.service('kirkApi', ['$resource', function($resource){
   this.get_access_addr = function() {
     return access_addr.get()
   }
+
+  var app_list = $resource("/api/kirk/apps", {}, {get: {method: "GET", isArray:true}})
+  this.get_app_list = function() {
+    return app_list.get()
+  }
 }])
 
 agentApp.service('configService', function(){
@@ -57,6 +82,7 @@ agentApp.service('configService', function(){
 })
 
 // CONTROLLERS
+// ------------ home page ------------
 agentApp.controller(
   'homeController', 
   [
@@ -111,6 +137,7 @@ agentApp.controller(
   ]
 )
 
+// ------------ creating page ------------
 agentApp.controller(
   'creatingController', 
   [
@@ -148,6 +175,7 @@ agentApp.controller(
   ]
 )
 
+// ------------ info page ------------
 agentApp.controller(
   'infoController', 
   [
@@ -164,9 +192,36 @@ agentApp.controller(
       $scope.$on('$destroy', function() {
          $interval.cancel(intvl);
       });
+
+      this.loading = {
+        appauth_status: true,
+        app_list: true,
+        datasources: true,
+      }
+      this.isLoding = function() {
+        for (var key in self.loading) {
+          if (self.loading[key]===true){
+            return true
+          }
+        }
+        return false
+      }
+
+      agentApi.getAppAuthStatus().$promise.then(function(data){
+        self.appauth_status = data;
+        self.loading.appauth_status = false;
+      });
+      kirkApi.get_app_list().$promise.then(function(data){
+        self.app_list = data;
+        self.loading.app_list = false;
+      }, function(error){console.log(error);});
+      agentApi.get_datasource().$promise.then(function(data){
+        self.datasources = data;
+        self.loading.datasources = false;
+      }, function(error){console.log(error);});
       
       this.access = function(){
-        if(this.service_info.status !== "RUNNING") {
+        if(self.service_info.status !== "RUNNING") {
           alert("服务尚未运行，请等待服务运行!");
           return;
         }
@@ -175,10 +230,50 @@ agentApp.controller(
         })
       }
 
+      this.add_datasource = function(appuri) {
+        agentApi.add_datasource({appuri:appuri}).$promise.then(function(data){
+          window.location.reload();
+        }, function(error){
+          console.log(error);
+        })
+      }
+      this.alredy_add = function(appuri) {
+        if (!self.datasources){
+          return false
+        }
+        for(var i=0; i<self.datasources.data.length; i++){
+          if (self.datasources.data[i].name === appuri){
+            return true
+          }
+        }
+        return false
+      }
+      this.delete_datasource = function(appuri) {
+        if (!self.datasources) {
+          return
+        }
+        id = -1;
+        for (var i=0; i< self.datasources.data.length; i++) {
+          if (self.datasources.data[i].name  === appuri) {
+            id = self.datasources.data[i].id;
+            break;
+          }
+        }
+        if (id < 0) {
+          return
+        }
+
+        agentApi.delete_datasource(id).$promise.then(function(data){
+          window.location.reload();
+        }, function(error){
+          console.log(error);
+        })
+      }
+
       self.addr = ""
       this.get_access = function(){
         self.addr = "";
-        if(this.service_info.status !== "RUNNING") {
+        if(self.service_info.status !== "RUNNING") {
           alert("服务尚未运行，请等待服务运行!");
           return;
         }
@@ -190,6 +285,7 @@ agentApp.controller(
   ]
 )
 
+// ------------ failed page ------------
 agentApp.controller(
   'failedController', 
   [
