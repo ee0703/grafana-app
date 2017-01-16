@@ -75,3 +75,12 @@ btn.btn-primary.btn-mute:hover {
   border-bottom: 1px solid #e6e9f0;
 }
 
+.q-card {
+    background-color: #F4F9FF;
+    border-color: #cee1f5;
+    color: #528fcc;
+    padding: 14px 16px;
+    margin: 14px 0;
+    border-radius: 4px;
+}
+
