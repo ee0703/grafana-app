@@ -1,8 +1,8 @@
 
-<div class="row" ng-if="ctrl.status && ctrl.status.value==='initialized'">
+<div class="row">
   <form name="configForm">
     <div class="col-md-6">
-      <h5 style="color:#5e6166" data-toggle="tooltip" title="默认管理员用户名 admin 密码，用来管理和配置您的 Grafana 应用的监控数据源及数据。!">管理员密码设置</h5>
+      <h5 style="color:#5e6166" data-toggle="tooltip">更改管理员密码</h5>
       <hr>
       <span><b>密　　码　</b></span>
       <input style="width:300px;display:inline-block;" class="form-control" type="password" name="password" ng-model="ctrl.password" placeholder="请输入密码" ng-required ng-change="ctrl.check_pwd()">
@@ -13,8 +13,8 @@
       <hr>
 
       <div ng-show="ctrl.errmsg" class="alert alert-danger" role="alert"> {{ctrl.errmsg}} </div>
-      <a ng-click="ctrl.create_app()" href="javascript:void(0)" class="btn btn-primary btn-mute" style="display:inline-block;border:1px solid #99F">
-        确认配置
+      <a ng-click="ctrl.submit()" href="javascript:void(0)" class="btn btn-primary btn-mute" style="display:inline-block;border:1px solid #99F">
+        确认
       </a>
     </div>
   </form>

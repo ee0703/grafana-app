@@ -1,8 +1,9 @@
 import requests
 import os
+import qiniu
 from qiniu import http
 from qiniu.services.compute import app
-from qiniu.auth import QiniuMacAuth
+from qiniu.auth import Auth, QiniuMacAuth
 from qiniu import QcosClient
 
 
@@ -46,6 +47,13 @@ def get_app_key(appuri):
 
 
 APP_HOST = "https://app-api.qiniu.com"
+# APP_HOST = "http://app-api.cs.qiniu.io"
+
+# fix python sdk bug
+# this line should be removed when python-sdk bug fixed
+qiniu.services.compute.config.KIRK_HOST["APPGLOBAL"] = APP_HOST
+
 QCOS_API = QcosClient(None)
+#QCOS_API = QcosClient(QiniuMacAuth(os.environ.get("KIRK_APP_AK"), os.environ.get("KIRK_APP_SK")), "https://kirk-api-nq.qiniu.com")
 ACC_AUTH = get_account_auth()
 APP_API = app.AccountClient(ACC_AUTH, APP_HOST) if ACC_AUTH else None

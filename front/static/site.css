@@ -1,0 +1,77 @@
+html {
+  font-size:10px;
+}
+
+body {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.42857143;
+  font-family: "Avenir Next","Helvetica Neue",Helvetica,Arial,"PingFang SC","Source Han Sans SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi MicroHei",sans-serif;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-round {
+  padding: 0 16px;
+  border-radius: 999px;
+}
+
+.btn.btn-danger.btn-emphasis.zeroclipboard-is-hover, .btn.btn-danger.btn-emphasis:hover {
+  background-color: #e03d3d;
+  border-color: #e03d3d;
+}
+
+.btn.btn-danger.btn-emphasis {
+  color: #fff;
+  background-color: #e55c5c;
+  border-color: #e55c5c;
+}
+
+.btn.btn-primary {
+  color: #1989fa;
+  background-color: rgba(25,137,250,.04);
+  border-color: rgba(25,137,250,.4);
+}
+
+.btn.btn-primary.btn-mute {
+  color: #1989fa;
+  background-color: transparent;
+  border-color: rgba(25,137,250,.4);
+}
+
+btn.btn-primary.btn-mute:hover {
+  border-color: rgba(25,137,250,.5);
+}
+
+.text-success {
+    color: #67c23a;
+}
+
+.table>thead>tr>td, .table>tbody>tr>td{
+  vertical-align: middle;
+  padding: 8px 0px;
+}
+
+.table>tbody>tr>th {
+  border-top: none;
+  color: #8d9199;
+  padding: 8px 0px;
+}
+
+.section-title {
+  font-size: 16px;
+  padding-bottom: 13px;
+  margin: 15px 0px;
+  border-bottom: 1px solid #e6e9f0;
+}
+

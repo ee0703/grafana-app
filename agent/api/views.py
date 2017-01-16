@@ -51,7 +51,7 @@ def create_app(request):
     if result[0] is not None and STACK_NAME not in [s["name"] for s in result[0]]:
         QCOS_API.create_stack({"name": STACK_NAME})
 
-    # 创建 service, size一般定死为1U2G
+    # 创建 service, size定死为1U2G
     params = json.loads(request.body.decode("utf-8"))
     service = {
         "name": SERVICE_NAME,
@@ -69,7 +69,7 @@ def create_app(request):
     result = QCOS_API.create_service(STACK_NAME, service)
     if result[0] is None:
         update_status("failed")
-        return JsonResponse({"result": "failed creating service"})
+        return JsonResponse({"result": "failed creating service", "message": result[1]}, status="500")
 
     # 保存密码和状态
     set_or_create_config(name="password", value=params["password"])
@@ -88,9 +88,10 @@ def _get_service_info(stack, service):
 def service_info(request):
     """"获取grafana服务信息(返回json)"""
     service = _get_service_info(STACK_NAME, SERVICE_NAME)
+    service.pop("spec")
     if service:
         return JsonResponse(service, safe=False)
-    return JsonResponse({"error": "service not found"}, status=404)
+    return JsonResponse({"error": "service not found"}, status=500)
 
 
 def _get_service_ip(service=None):
@@ -134,6 +135,8 @@ def get_apps(request):
     apps = data[0]
     if apps is None:
         return JsonResponse({}, status=500)
+
+    apps = [app for app in apps if "vendorUri" not in app or app["vendorUri"]==app["account"]]
     return JsonResponse(apps, safe=False)
 
 
@@ -206,3 +209,19 @@ def delete_data_source(request, datasource_id):
         else:
             return JsonResponse({"error": "delete datasource error", "data": ret.text})
 
+
+def set_password(request):
+    
+    if request.method != 'POST':
+        return JsonResponse({"error": "method must be post"}, status=400)
+
+    json_data = json.loads(request.body)
+    password = json_data.get("password")
+
+    data = {"spec": {"envs": ["GF_SECURITY_ADMIN_PASSWORD={}".format(password)]}}
+    ret = QCOS_API.update_service(STACK_NAME, SERVICE_NAME, data)
+
+    if ret[0] is not None:
+        return JsonResponse({"status": "sucess"})
+    else:
+        return JsonResponse({"status": "failed", "message": ret[1]}, status=500)

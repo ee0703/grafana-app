@@ -16,6 +16,10 @@ agentApp.config(function($routeProvider){
     templateUrl: '/pages/info.html',
     controller: 'infoController as ctrl'
   })
+  .when('/modify_pwd', {
+    templateUrl: '/pages/modify_pwd.html',
+    controller: 'pwdController as ctrl'
+  })
   .when('/failed', {
     templateUrl: '/pages/failed.html',
     controller: 'failedController as ctrl'
@@ -53,6 +57,7 @@ agentApp.service('agentApi', ['$resource', function($resource){
   this.delete_datasource = function(id) {
     return data_sources_del.delete({id:id})
   }
+
 }])
 
 agentApp.service('kirkApi', ['$resource', function($resource){
@@ -75,6 +80,12 @@ agentApp.service('kirkApi', ['$resource', function($resource){
   this.get_app_list = function() {
     return app_list.get()
   }
+
+  var admin_password = $resource("/api/kirk/password", {}, {post: {method:"POST"}})
+  this.setPassword = function(pwd) {
+    return admin_password.post({"password": pwd})
+  }
+
 }])
 
 agentApp.service('configService', function(){
@@ -185,7 +196,11 @@ agentApp.controller(
 
       // set auto update
       var updateInfo = function() {
-        self.service_info = kirkApi.get_service_info()
+        kirkApi.get_service_info().$promise.then(
+          function(data){
+            self.service_info = data
+          }
+        )
       }
       updateInfo()
       intvl = $interval(updateInfo, 5000)
@@ -252,7 +267,7 @@ agentApp.controller(
         if (!self.datasources) {
           return
         }
-        id = -1;
+        var id = -1;
         for (var i=0; i< self.datasources.data.length; i++) {
           if (self.datasources.data[i].name  === appuri) {
             id = self.datasources.data[i].id;
@@ -268,6 +283,36 @@ agentApp.controller(
         }, function(error){
           console.log(error);
         })
+      }
+
+      this.get_status_icon = function() {
+        var trans = {
+          "RUNNING" : "glyphicon-play",
+          "NOT-RUNNING": "glyphicon-stop"
+        }
+
+        if (self.service_info) {
+          return trans[self.service_info.status]
+        }
+
+        return ""
+      }
+
+      this.runningTime = function() {
+        if (!self.service_info || self.service_info.status !== "RUNNING") {
+          return "-"
+        }
+        var now = new Date();
+        var bDay = new Date(self.service_info.updatedAt);
+        var elapsedT = now - bDay;
+        var secs = elapsedT/1000;
+        var minutes = secs / 60;
+        var sec = secs % 60;
+        var hours = minutes / 60;
+        var minute = minutes % 60;
+        var hour = hours % 60;
+        var day = hours / 12;
+        return Math.floor(day) + "天" + Math.floor(hour) +"小时" + Math.floor(minute) + "分钟";
       }
 
       self.addr = ""
@@ -289,9 +334,43 @@ agentApp.controller(
 agentApp.controller(
   'failedController', 
   [
-    '$scope', '$log', '$location',  'agentApi', 'kirkApi', 'configService',
+    '$scope', '$log', '$location', 'agentApi', 'kirkApi', 'configService',
     function($scope, $log, $location, agentApi, kirkApi, configService){
       var self = this
+    }
+  ]
+)
+
+// ------------ pwd set page ------------
+agentApp.controller(
+  'pwdController', 
+  [
+    '$scope', '$log', '$location', 'agentApi', 'kirkApi', 'configService',
+    function($scope, $log, $location, agentApi, kirkApi, configService){
+      var self = this
+
+      this.submit = function() {
+        kirkApi.setPassword(self.password).$promise.then(
+          function(data){
+            $location.path("/info")
+          },function(err) {
+            alert("设置密码失败!")
+          }
+        )
+      }
+
+      this.check_pwd = function(){
+        if(!this.password || this.password.length < 6) {
+          this.errmsg = "密码长度必须在6位以上"
+          return
+        }
+        if(this.password != this.password2) {
+          this.errmsg = "两次输入的密码不一致"
+          return
+        }
+        this.errmsg = ""
+      }
+
     }
   ]
 )

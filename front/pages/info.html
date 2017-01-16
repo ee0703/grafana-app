@@ -1,8 +1,46 @@
-<h5 style="color:#5e6166">Grafana 服务管理</h5>
 
-<hr>
+<div class="section-title">访问和设置</div>
 
-<div class="alert alert-info" role="alert">
+<a ng-click="ctrl.get_access()" href="javascript:void(0)" class="btn btn-primary btn-mute">
+  获取访问地址
+</a>
+<a ng-click="ctrl.access()" href="javascript:void(0)" class="btn btn-primary btn-mute">
+  访问Grafana
+</a>
+<!--<a href="/#!/modify_pwd" class="btn btn-primary btn-mute">
+  更改密码
+</a>-->
+<br>
+<br>
+<div ng-show="ctrl.addr" class="alert alert-info" role="alert"> {{ctrl.addr}} </div>
+
+
+
+<div class="section-title">Grafana 服务状态</div>
+<table class="table">
+  <tr>
+    <th>项目</th>
+    <th>状态</th>
+  </tr>
+  <tr>
+    <td>运行状态</td>
+    <td>
+      <span class="glyphicon" ng-class="ctrl.get_status_icon()" aria-hidden="true"></span>
+      <span ng-class="{'text-success': ctrl.service_info.status==='RUNNING'}">{{ctrl.service_info.status}}</span>
+    </td>
+  </tr>
+  <tr>
+    <td>运行时间</td>
+    <td>
+      <span> {{ctrl.runningTime()}} </span>
+    </td>
+  </tr>
+</table>
+
+
+
+<div>
+  <div class="section-title">数据源管理</div>
 
   <p ng-if="ctrl.isLoding()">
     <img src="/static/loading-2.gif" alt="">
@@ -14,27 +52,23 @@
   </p>
 
   <div ng-if="!(ctrl.isLoding()) && ctrl.appauth_status && ctrl.appauth_status.status">
-    <p ng-repeat="app in ctrl.app_list">
-      <a ng-if="!ctrl.alredy_add(app.uri)" ng-click="ctrl.add_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">添加监控</a>
-      <a ng-if="ctrl.alredy_add(app.uri)" ng-click="ctrl.delete_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">删除监控</a>
-      {{app.uri}}
-    </p>
+    <table class="table">
+      <tr>
+        <th>应用名称</th>
+        <th>应用类型</th>
+        <th>应用状态</th>
+        <th>操作</th>
+      </tr>
+    <tr ng-repeat="app in ctrl.app_list">
+      <td><b>{{app.title}}</b>&nbsp;({{app.uri}})</td>
+      <td>{{app.runMode==="Private" ? "私有应用" : "第三方应用"}}</td>
+      <td><span ng-class="{'text-success': ctrl.alredy_add(app.uri)}">{{ctrl.alredy_add(app.uri) ? "已监控" : "未监控"}}</span></td>
+      <td>
+        <a ng-if="!ctrl.alredy_add(app.uri)" ng-click="ctrl.add_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">添加监控</a>
+        <a ng-if="ctrl.alredy_add(app.uri)" ng-click="ctrl.delete_datasource(app.uri)" class="btn btn-outline ng-scope" style="display:inline-block;border:1px solid #99F">删除监控</a>
+      </td>
+    </tr>
+    </table>
   </div>
 
 </div>
-
-<table class="table">
-  <tr>
-    <td>状态</td>
-    <td>{{ctrl.service_info.status || "获取中..."}}</td>
-  </tr>
-</table>
-<a ng-click="ctrl.get_access()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">
-  获取访问地址
-</a>
-<a ng-click="ctrl.access()" href="javascript:void(0)" class="btn btn-outline" style="display:inline-block;border:1px solid #99F">
-  访问Grafana
-</a>
-<br>
-<br>
-<div ng-show="ctrl.addr" class="alert alert-info" role="alert"> {{ctrl.addr}} </div>
