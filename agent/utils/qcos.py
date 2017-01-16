@@ -5,6 +5,7 @@ from qiniu import http
 from qiniu.services.compute import app
 from qiniu.auth import Auth, QiniuMacAuth
 from qiniu import QcosClient
+from urlparse import urlparse
 
 
 class Proxy(object):
@@ -16,7 +17,8 @@ class Proxy(object):
         data = QCOS_API.get_web_proxy(self.entry)
         url = data[0]["oneTimeUrl"]
         req = self.session.get(url)
-        url_ret = req.url.rstrip('/')
+        parsed_uri = urlparse(req.url)
+        url_ret = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
         return self.session, url_ret
 
     def __exit__(self, type, value, traceback):
