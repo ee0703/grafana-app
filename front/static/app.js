@@ -141,7 +141,7 @@ agentApp.controller(
         }
 
         this.submiting = true
-        configService.configForm = {password: self.password, size: '1U2G'}
+        configService.configForm = {password: self.password, size: '1U1G'}
         $location.path('/creating')
       }
     }

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
+import traceback
 from requests.auth import HTTPBasicAuth
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
-from utils.qcos import QCOS_API, APP_API, Proxy, get_app_info, get_app_key
+from utils.qcos import QCOS_API, APP_API, Proxy, get_app_info, get_app_key, get_managed
 from .models import Config, get_or_create_config, set_or_create_config, update_status
 
 STACK_NAME = "default"
@@ -51,7 +52,7 @@ def create_app(request):
     if result[0] is not None and STACK_NAME not in [s["name"] for s in result[0]]:
         QCOS_API.create_stack({"name": STACK_NAME})
 
-    # 创建 service, size定死为1U2G
+    # 创建 service, size定死为1U1G
     params = json.loads(request.body.decode("utf-8"))
     service = {
         "name": SERVICE_NAME,
@@ -76,7 +77,6 @@ def create_app(request):
     update_status("deployed")
 
     return JsonResponse({"result": "success"})
-
 
 
 def _get_service_info(stack, service):
@@ -137,6 +137,13 @@ def get_apps(request):
         return JsonResponse({}, status=500)
 
     apps = [app for app in apps if "vendorUri" not in app or app["vendorUri"]==app["account"]]
+
+    managed = get_managed()
+    if managed:
+        apps = apps + managed
+
+    apps = make_unique(apps)
+
     return JsonResponse(apps, safe=False)
 
 
@@ -147,8 +154,16 @@ def data_sources(request):
 
     if request.method == 'GET':
         with Proxy("%s:3000" % ip) as (session, vpn_addr):
-            url = "%s/api/datasources" % vpn_addr
             password = _get_service_password()
+
+            # import dashbord if needed
+            try:
+                import_dashboards(ip, password)
+            except:
+                traceback.print_exc()
+
+            # get the datasources
+            url = "%s/api/datasources" % vpn_addr
             ret = session.get(url, auth=HTTPBasicAuth('admin', password))
             data = json.loads(ret.text)
             return JsonResponse({"data": data})
@@ -225,3 +240,53 @@ def set_password(request):
         return JsonResponse({"status": "sucess"})
     else:
         return JsonResponse({"status": "failed", "message": ret[1]}, status=500)
+
+
+def make_unique(original_list):
+    unique_list = []
+    map(lambda x: unique_list.append(x) if (x not in unique_list) else False, original_list)
+    return unique_list
+
+
+def import_dashboards(ip, password):
+
+    with Proxy("%s:3000" % ip) as (session, vpn_addr):
+
+        url = "%s/api/plugins/kirkmonitor/dashboards" % vpn_addr
+        ret = session.get(url, auth=HTTPBasicAuth('admin', password))
+        dashbords_exist = json.loads(ret.text)
+
+        dashbords = [
+            {
+                "pluginId": "kirkmonitor",
+                "path": u"dashboards/1-1 应用概览.json",
+                "overwrite": False,
+                "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
+            },
+            {
+                "pluginId": "kirkmonitor",
+                "path": u"dashboards/2-1 服务和容器.json",
+                "overwrite": False,
+                "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
+            },
+            {
+                "pluginId": "kirkmonitor",
+                "path": u"dashboards/3-1 公网域名.json",
+                "overwrite": False,
+                "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
+            },
+            {
+                "pluginId": "kirkmonitor",
+                "path": u"dashboards/3-2 公网 IP.json",
+                "overwrite": False,
+                "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
+            }
+        ]
+
+        for ds in dashbords:
+            url = "%s/api/dashboards/import" % vpn_addr
+            ds_list = [de for de in dashbords_exist if (u"path" in de) and (de[u"path"] == ds["path"]) and de[u"imported"]]
+            if len(ds_list) == 0:
+                req = session.post(url, json=ds, auth=HTTPBasicAuth('admin', password))
+                print req
+

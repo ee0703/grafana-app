@@ -40,6 +40,13 @@ def get_app_info(appuri):
     return http._get_with_qiniu_mac(url, None, ACC_AUTH)[0]
 
 
+def get_managed():
+    if ACC_AUTH is None:
+        return None
+    url = '{0}/v3/managed'.format(APP_HOST)
+    return http._get_with_qiniu_mac(url, None, ACC_AUTH)[0]
+
+
 def get_app_key(appuri):
     if ACC_AUTH is None:
         return None
@@ -56,6 +63,6 @@ APP_HOST = "https://app-api.qiniu.com"
 qiniu.services.compute.config.KIRK_HOST["APPGLOBAL"] = APP_HOST
 
 QCOS_API = QcosClient(None)
-#QCOS_API = QcosClient(QiniuMacAuth(os.environ.get("KIRK_APP_AK"), os.environ.get("KIRK_APP_SK")), "https://kirk-api-nq.qiniu.com")
+# QCOS_API = QcosClient(QiniuMacAuth(os.environ.get("KIRK_APP_AK"), os.environ.get("KIRK_APP_SK")), "https://kirk-api-nq.qiniu.com")
 ACC_AUTH = get_account_auth()
 APP_API = app.AccountClient(ACC_AUTH, APP_HOST) if ACC_AUTH else None
