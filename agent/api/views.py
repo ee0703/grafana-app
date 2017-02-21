@@ -280,6 +280,12 @@ def import_dashboards(ip, password):
                 "path": u"dashboards/3-2 公网 IP.json",
                 "overwrite": False,
                 "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
+            },
+            {
+                "pluginId": "kirkmonitor",
+                "path": u"dashboards/3-3 硬盘空间.json",
+                "overwrite": False,
+                "inputs": [{"name":"*","type":"datasource","pluginId":"kirkmonitor","value":""}]
             }
         ]
 
