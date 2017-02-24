@@ -64,7 +64,15 @@ def create_app(request):
                 "GF_SECURITY_ADMIN_USER=admin"
             ],
             "image": IMAGE
-        }
+        },
+        "volumes": [
+            {
+            "name": "vol1",
+            "mountPath": "/grafana",
+            "fsType": "ext4",
+            "unitType": "SSD1_10G"
+            }
+        ],
     }
     update_status("creating:service")
     result = QCOS_API.create_service(STACK_NAME, service)
