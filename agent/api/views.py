@@ -57,14 +57,15 @@ def create_app(request):
     service = {
         "name": SERVICE_NAME,
         "spec": {
-            "unitType": params["size"],
+            "unitType": "1U1G",
             "instanceNum": 1,
             "envs": [
                 "GF_SECURITY_ADMIN_PASSWORD={}".format(params["password"]),
-                "GF_SECURITY_ADMIN_USER=admin"
+                "GF_SECURITY_ADMIN_USER=admin",
             ],
-            "image": IMAGE
+            "image": IMAGE,
         },
+        "stateful": false,
         "volumes": [
             {
             "name": "vol1",
@@ -164,12 +165,6 @@ def data_sources(request):
         with Proxy("%s:3000" % ip) as (session, vpn_addr):
             password = _get_service_password()
 
-            # import dashbord if needed
-            try:
-                import_dashboards(ip, password)
-            except:
-                traceback.print_exc()
-
             # get the datasources
             url = "%s/api/datasources" % vpn_addr
             ret = session.get(url, auth=HTTPBasicAuth('admin', password))
@@ -186,6 +181,12 @@ def data_sources(request):
         appinfo = get_app_info(appuri)
         if not appinfo:
             return JsonResponse({"error": "app not found"}, status=500)
+
+        # 添加datasource前导入dashbords
+        try:
+            import_dashboards(ip, password)
+        except:
+            traceback.print_exc()
 
         # 获取app ak sk
         appkey = get_app_key(appuri)
@@ -296,5 +297,3 @@ def import_dashboards(ip, password):
             ds_list = [de for de in dashbords_exist if (u"path" in de) and (de[u"path"] == ds["path"]) and de[u"imported"]]
             if len(ds_list) == 0:
                 req = session.post(url, json=ds, auth=HTTPBasicAuth('admin', password))
-                print req
-
