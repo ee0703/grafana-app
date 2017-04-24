@@ -65,7 +65,7 @@ def create_app(request):
             ],
             "image": IMAGE,
         },
-        "stateful": false,
+        "stateful": False,
         "volumes": [
             {
             "name": "vol1",
@@ -160,10 +160,11 @@ def data_sources(request):
     """获取或添加grafana数据源"""
     # 获取grafana服务的访问ip
     ip = _get_service_ip()
+    # 获取grafana密码
+    password = _get_service_password()
 
     if request.method == 'GET':
         with Proxy("%s:3000" % ip) as (session, vpn_addr):
-            password = _get_service_password()
 
             # get the datasources
             url = "%s/api/datasources" % vpn_addr
@@ -195,7 +196,6 @@ def data_sources(request):
 
         with Proxy("%s:3000" % ip) as (session, vpn_addr):
             url = "%s/api/datasources" % vpn_addr
-            password = _get_service_password()
             datasource = {
                 "name": appuri,
                 "type": "kirkmonitor",
