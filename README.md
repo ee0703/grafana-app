@@ -39,7 +39,7 @@ make run
 
 
 ## 附(FAQ)：
-1、index.qiniu.io 镜像不能拉取问题  
+1、index.qiniu.com 镜像不能拉取问题  
 
 需要使用 ak/sk 先登录镜像服务器
 
