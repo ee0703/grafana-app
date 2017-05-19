@@ -35,7 +35,7 @@ sudo pip install -r requirement.txt
 make run
 ```
 
-打开 localhost:8086 , 选择 `kirk-vednor.grafana` 这个spec，把镜像改成刚才推上去的镜像即可
+打开 localhost:8086 , 选择 `kirk-vednor.grafana` 这个spec，把spec的镜像名改成刚才推上去的镜像名（grafana-seed:tagxxx）即可
 
 
 ## 附(FAQ)：
@@ -44,5 +44,5 @@ make run
 需要使用 ak/sk 先登录镜像服务器
 
 ```
-docker login index.qiniu.io
+docker login index.qiniu.com
 ```
