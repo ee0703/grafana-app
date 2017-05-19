@@ -25,8 +25,8 @@ kirk images push grafana-seed:tagxxx
 
 ```
 git clone git@gitlab.qiniu.io:pengquanxin/kirktools.git
-cd kirktools
-sudo pip install -r requirement.txt
+cd kirktools/apptools
+sudo pip install -r requirements.txt
 ```
 
 然后在配置文件 `config/env.py` 中填入 `kirk-vendor` 的ak、sk，直接`make run`运行即可
